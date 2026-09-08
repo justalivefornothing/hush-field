@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer, useState } from 'react'
-import { chord, createBoard, primaryAction, toggleMark, type Board } from '../engine/board'
+import { REVEALED, chord, createBoard, primaryAction, toggleMark, type Board } from '../engine/board'
 import { dailySeed, randomSeed } from '../engine/rng'
 import { PRESETS, decodeHash, encodeHash, sanitize, type Config } from './presets'
 
@@ -65,7 +65,9 @@ function reducer(state: GameState, action: Action): GameState {
       return { ...next, flagMode: state.flagMode }
     }
     case 'primary': {
-      const board = state.flagMode
+      // Flag mode turns plain clicks into flags, but chording a number still works.
+      const flagging = state.flagMode && state.board.state[action.index] !== REVEALED
+      const board = flagging
         ? toggleMark(state.board, action.index)
         : primaryAction(state.board, action.index, state.seed)
       return { ...withBoard(state, board, action.now), cursor: action.index }

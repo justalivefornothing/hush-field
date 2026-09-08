@@ -65,6 +65,7 @@ function CellView(p: CellProps) {
 
   return (
     <div
+      id={`cell-${p.index}`}
       role="gridcell"
       data-i={p.index}
       data-n={open && !showMine && p.count > 0 ? p.count : undefined}

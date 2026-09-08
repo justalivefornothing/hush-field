@@ -143,6 +143,7 @@ export function Board({ board, cursor, onPrimary, onChord, onMark, onMove, onNew
         aria-label={`Minefield, ${width} by ${height}, ${board.mineCount} mines`}
         aria-rowcount={height}
         aria-colcount={width}
+        aria-activedescendant={`cell-${cursor}`}
         tabIndex={0}
         className="board"
         style={style}
