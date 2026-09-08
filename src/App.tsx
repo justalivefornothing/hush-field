@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { maxMines } from './engine/board'
+import { FLAGGED, maxMines } from './engine/board'
 import { dailySeed } from './engine/rng'
 import { formatTime, useBestTimes } from './game/bestTimes'
 import { LIMITS, PRESETS, presetFor, sanitize, type Config, type PresetKey } from './game/presets'
@@ -66,7 +66,10 @@ export default function App() {
   else if (status === 'lost') {
     const x = (board.exploded % board.width) + 1
     const y = Math.floor(board.exploded / board.width) + 1
-    outcome = `Boom. A mine at row ${y}, column ${x}. Wrong flags are marked.`
+    let wrong = 0
+    for (let i = 0; i < board.state.length; i++) if (board.state[i] === FLAGGED && !board.mines[i]) wrong++
+    outcome = `Boom. A mine at row ${y}, column ${x}.`
+    if (wrong > 0) outcome += ` ${wrong} wrong ${wrong === 1 ? 'flag is' : 'flags are'} marked.`
   } else if (status === 'idle') outcome = 'Your first click is always safe and always opens a region.'
   else outcome = flagMode ? 'Flag mode: clicks place flags.' : 'Click a satisfied number to chord its neighbours.'
 

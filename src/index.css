@@ -321,6 +321,11 @@ kbd {
   align-items: stretch;
   gap: 0.75rem;
   width: max-content;
+  min-width: min(100%, 22rem);
+  max-width: 100%;
+}
+.table > .board-scroll {
+  align-self: center;
   max-width: 100%;
 }
 /* Rows that should follow the board's width instead of widening it. */
