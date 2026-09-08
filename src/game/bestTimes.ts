@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { Board } from '../engine/board'
 import type { Config } from './presets'
 
@@ -40,28 +40,25 @@ export function useBestTimes(board: Board, config: Config, elapsedMs: number) {
   const [times, setTimes] = useState<BestTimes>(() =>
     loadBestTimes(typeof localStorage === 'undefined' ? null : localStorage),
   )
-  const [isNewBest, setIsNewBest] = useState(false)
-  const recorded = useRef<Board | null>(null)
+  const [lastWin, setLastWin] = useState<{ board: Board; newBest: boolean } | null>(null)
+
+  // A won board is an immutable snapshot, so "have we scored this one" is a
+  // plain identity check and can be derived during render.
+  if (board.status === 'won' && lastWin?.board !== board) {
+    const next = recordBest(times, configKey(config), elapsedMs)
+    if (next !== times) setTimes(next)
+    setLastWin({ board, newBest: next !== times })
+  }
 
   useEffect(() => {
-    if (board.status !== 'won') {
-      if (isNewBest && board.status === 'idle') setIsNewBest(false)
-      return
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(times))
+    } catch {
+      /* private mode or quota: keep the in-memory table */
     }
-    if (recorded.current === board) return
-    recorded.current = board
-    const next = recordBest(times, configKey(config), elapsedMs)
-    setIsNewBest(next !== times)
-    if (next !== times) {
-      setTimes(next)
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-      } catch {
-        /* private mode or quota: keep the in-memory table */
-      }
-    }
-  }, [board, config, elapsedMs, times, isNewBest])
+  }, [times])
 
   const bestFor = useCallback((c: Config): number | undefined => times[configKey(c)], [times])
+  const isNewBest = board.status === 'won' && lastWin?.board === board && lastWin.newBest
   return { bestFor, isNewBest }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { FLAGGED, maxMines } from './engine/board'
 import { dailySeed } from './engine/rng'
 import { formatTime, useBestTimes } from './game/bestTimes'
@@ -28,13 +28,11 @@ export default function App() {
   const { bestFor, isNewBest } = useBestTimes(board, config, game.elapsedMs)
 
   const [customOpen, setCustomOpen] = useState(preset === 'custom')
-  const [seedDraft, setSeedDraft] = useState(seed)
   const [copied, setCopied] = useState(false)
-  useEffect(() => setSeedDraft(seed), [seed])
 
-  const commitSeed = () => {
-    const next = seedDraft.trim()
-    if (!next) setSeedDraft(seed)
+  const commitSeed = (input: HTMLInputElement) => {
+    const next = input.value.trim()
+    if (!next) input.value = seed
     else if (next !== seed) game.newGame(undefined, next)
   }
 
@@ -124,14 +122,14 @@ export default function App() {
           <label className="flex min-w-0 flex-1 basis-56 items-center gap-2 text-[13px] text-ink-300">
             <span className="shrink-0">seed</span>
             <input
+              key={seed}
               className="field min-w-0 flex-1"
-              value={seedDraft}
+              defaultValue={seed}
               spellCheck={false}
               autoComplete="off"
-              onChange={(e) => setSeedDraft(e.target.value)}
-              onBlur={commitSeed}
+              onBlur={(e) => commitSeed(e.currentTarget)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
+                if (e.key === 'Enter') e.currentTarget.blur()
               }}
               aria-label="Board seed"
             />

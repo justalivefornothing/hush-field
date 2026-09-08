@@ -97,7 +97,6 @@ export function useGame() {
   const live = state.board.status === 'playing'
   useEffect(() => {
     if (!live) return
-    setNow(Date.now())
     const id = window.setInterval(() => setNow(Date.now()), 200)
     return () => window.clearInterval(id)
   }, [live])
