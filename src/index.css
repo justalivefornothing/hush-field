@@ -1,0 +1,45 @@
+@import 'tailwindcss';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
+
+@theme {
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-ink-950: #070c16;
+  --color-ink-900: #0b1220;
+  --color-ink-800: #111a2c;
+  --color-ink-700: #182338;
+  --color-ink-600: #22304a;
+  --color-ink-500: #34435f;
+  --color-ink-300: #7a88a3;
+  --color-ink-200: #a9b4c9;
+  --color-ink-100: #dbe2ef;
+
+  --color-mint-300: #6ee7b7;
+  --color-mint-400: #34d399;
+  --color-mint-500: #10b981;
+  --color-mint-600: #059669;
+
+  --color-danger: #fb7185;
+  --color-warn: #fbbf24;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--color-ink-900);
+  color: var(--color-ink-100);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+#root {
+  min-height: 100dvh;
+}
