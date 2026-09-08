@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { maxMines } from './engine/board'
 import { dailySeed } from './engine/rng'
+import { formatTime, useBestTimes } from './game/bestTimes'
 import { LIMITS, PRESETS, presetFor, sanitize, type Config, type PresetKey } from './game/presets'
 import { useGame } from './game/useGame'
 import { Board } from './ui/Board'
@@ -24,6 +25,7 @@ export default function App() {
   const { board, config, seed, cursor, flagMode } = game.state
   const preset = presetFor(config)
   const isDaily = seed === dailySeed()
+  const { bestFor, isNewBest } = useBestTimes(board, config, game.elapsedMs)
 
   const [customOpen, setCustomOpen] = useState(preset === 'custom')
   const [seedDraft, setSeedDraft] = useState(seed)
@@ -60,7 +62,7 @@ export default function App() {
   const status = board.status
 
   let outcome: string
-  if (status === 'won') outcome = `Cleared in ${seconds}s. Every mine flagged.`
+  if (status === 'won') outcome = `Cleared in ${formatTime(game.elapsedMs)}.${isNewBest ? ' New personal best.' : ''}`
   else if (status === 'lost') {
     const x = (board.exploded % board.width) + 1
     const y = Math.floor(board.exploded / board.width) + 1
@@ -92,6 +94,7 @@ export default function App() {
           {PRESET_LABELS.map(([key, label]) => {
             const active = key === 'custom' ? customOpen || preset === 'custom' : preset === key && !customOpen
             const c = key === 'custom' ? null : PRESETS[key]
+            const best = c ? bestFor(c) : undefined
             return (
               <button
                 key={key}
@@ -104,6 +107,7 @@ export default function App() {
                 {c && (
                   <span className="seg__meta">
                     {c.width}×{c.height} · {c.mines}
+                    {best !== undefined && ` · best ${formatTime(best)}`}
                   </span>
                 )}
               </button>
@@ -114,7 +118,7 @@ export default function App() {
         {customOpen && <CustomForm config={config} onApply={(c) => game.newGame(c)} />}
 
         <div className="flex flex-wrap items-center gap-2">
-          <label className="flex min-w-0 flex-1 items-center gap-2 text-[13px] text-ink-300">
+          <label className="flex min-w-0 flex-1 basis-56 items-center gap-2 text-[13px] text-ink-300">
             <span className="shrink-0">seed</span>
             <input
               className="field min-w-0 flex-1"
